@@ -12,3 +12,5 @@ gunicorn
 geopy
 django-jazzmin
 django-cors-headers
+python-barcode
+Pillow
