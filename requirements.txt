@@ -10,7 +10,7 @@ schedule==1.2.2
 loguru==0.7.2
 gunicorn
 geopy
-django-jazzmin
+
 django-cors-headers
 python-barcode
 Pillow
@@ -18,3 +18,5 @@ djangorestframework
 djangorestframework-simplejwt
 django-filter
 google-genai
+
+django-jazzmin
