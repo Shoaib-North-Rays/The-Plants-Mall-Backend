@@ -10,5 +10,5 @@ schedule==1.2.2
 loguru==0.7.2
 gunicorn
 geopy
-jazzmin
+django-jazzmin
 django-cors-headers
