@@ -47,8 +47,6 @@ INSTALLED_APPS = [
     'orders',
     'rest_framework',
     'corsheaders',
-    'cloudinary',
-    'cloudinary_storage',
     
 ]
  
