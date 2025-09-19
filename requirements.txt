@@ -14,3 +14,6 @@ django-jazzmin
 django-cors-headers
 python-barcode
 Pillow
+djangorestframework
+djangorestframework-simplejwt
+django-filter
