@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Salesmen Monitor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    body, html { height: 100%; margin: 0; }
+    #map { height: 100%; width: 100%; }
+    .label { font-weight: bold; font-size: 14px; }
+    .popup-img { width: 50px; height: 50px; border-radius: 50%; display: block; margin: 5px 0; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+<script>
+  // Initialize the map
+  const map = L.map('map').setView([30.3753, 69.3451], 6); // Default center Pakistan
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap'
+  }).addTo(map);
+
+  // Store markers by salesman ID
+  const markers = {};
+
+  async function loadLocations() {
+    try {
+      const resp = await fetch("http://127.0.0.1:8000/plants-mall-shops/api/staff-locations/");
+      const data = await resp.json();
+      const salesmen = data.results || data; // adjust if API wraps in results
+      const bounds = [];
+
+      salesmen.forEach(salesman => {
+        const lat = parseFloat(salesman.current_lat);
+        const lng = parseFloat(salesman.current_lng);
+
+        // Skip invalid coordinates
+        if (!lat || !lng) return;
+
+        const id = salesman.id;
+        const label = salesman.name || salesman.identifier || "Unknown";
+        const imgUrl = salesman.image_url || '/static/default-user.png';
+
+        const popupContent = `
+          <div class="label">${label}</div>
+          <div><img src="${imgUrl}" alt="${label}" class="popup-img"></div>
+          <div>${salesman.address || ""}</div>
+          <div>Last seen: ${salesman.last_seen}</div>
+        `;
+
+        if (markers[id]) {
+          // Update existing marker position and popup
+          markers[id].setLatLng([lat, lng]);
+          markers[id].setPopupContent(popupContent);
+        } else {
+          // Create new marker
+          markers[id] = L.marker([lat, lng]).addTo(map)
+            .bindPopup(popupContent);
+        }
+
+        // Add coordinates to bounds array
+        bounds.push([lat, lng]);
+      });
+
+      // Fit map to all markers
+      if (bounds.length > 0) {
+        map.fitBounds(bounds, { padding: [50, 50] });
+      }
+
+    } catch (err) {
+      console.error("Error loading locations:", err);
+    }
+  }
+
+  // Load markers initially
+  loadLocations();
+  // Refresh markers every 5 seconds
+  setInterval(loadLocations, 5000);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1 { text-align: center; color: #2c3e50; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #3498db;
+      color: white;
+    }
+    .totals { margin-top: 20px; text-align: right; }
+  </style>
+</head>
+<body>
+  <h1>Order Receipt</h1>
+
+  <p><b>Order Number:</b> {{ order.order_number }}</p>
+  <p><b>Shop:</b> {{ order.shop.shop_name }}</p>
+  <p><b>Order Taker:</b> {{ order.order_taker.name }}</p>
+  <p><b>Dispatcher:</b> {{ order.dispatcher.name if order.dispatcher }}</p>
+  <p><b>Delivery Rider:</b> {{ order.delivery_rider.name if order.delivery_rider }}</p>
+  <p><b>Date:</b> {{ order.created_at }}</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Packing Unit</th>
+        <th>Qty</th>
+        <th>Unit Price</th>
+        <th>Discount</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in order.items.all %}
+      <tr>
+        <td>{{ item.product.name }}</td>
+        <td>{{ item.cotton.packing_unit }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>Rs. {{ item.unit_price }}</td>
+        <td>{% if item.discount_price %}Rs. {{ item.discount_price }}{% else %}-{% endif %}</td>
+        <td>Rs. {{ item.quantity|floatformat:0|add:item.unit_price }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="totals">
+    <p><b>Subtotal:</b> Rs. {{ order.subtotal }}</p>
+    <p><b>Total:</b> Rs. {{ order.total_amount }}</p>
+  </div>
+</body>
+</html>

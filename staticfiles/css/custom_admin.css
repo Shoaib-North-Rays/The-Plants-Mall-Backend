@@ -1,0 +1,9 @@
+/* Make login page logo larger */
+.login-logo img {
+    max-height: 180px !important;
+}
+
+/* Make dashboard header logo smaller */
+.brand-link .brand-image {
+    max-height: 40px !important;
+}

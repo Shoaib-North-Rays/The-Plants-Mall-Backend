@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+  <title>Send My Location</title>
+</head>
+<body>
+  <h3>Location Tracking Test</h3>
+  <button onclick="sendLocation()">Send My Location</button>
+
+  <script>
+    async function getAddress(lat, lng) {
+      try {
+        const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+        const data = await resp.json();
+        return data.display_name || "";
+      } catch (err) {
+        console.error("Error fetching address:", err);
+        return "";
+      }
+    }
+
+    async function sendLocation() {
+      if (!navigator.geolocation) {
+        alert("Geolocation not supported!");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+
+        const identifier = "{{request.user.id}}";
+        console.log(identifier)
+
+        // Get real address from lat/lng
+        const address = await getAddress(lat, lng);
+
+        try {
+          const response = await fetch("http://127.0.0.1:8000/plants-mall-shops/api/update-locations/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              identifier: identifier,
+              lat: lat,
+              lng: lng,
+              address: address
+            })
+          });
+
+          const data = await response.json();
+          alert(`Location sent: ${lat}, ${lng} \nAddress: ${address}\nServer response: ${JSON.stringify(data)}`);
+        } catch (err) {
+          alert("Error sending location: " + err);
+        }
+
+      }, (err) => {
+        alert("Error getting location: " + err.message);
+      }, {
+        enableHighAccuracy: true
+      });
+    }
+  </script>
+</body>
+</html>
