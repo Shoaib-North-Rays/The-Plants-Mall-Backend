@@ -41,7 +41,7 @@ class OrderListCreateAPIView(generics.ListCreateAPIView):
         if user.role == "dispatcher":
             qs = qs.filter(dispatcher=user)
         elif user.role == "delivery_rider":
-            qs = qs.filter(delivery_rider=user, status="ready")
+            qs = qs.filter(delivery_rider=user,status__in=["ready","delivered"])
         elif user.role == "sales_man":
             qs = qs.filter(order_taker=user)
         if shop_id:
@@ -73,7 +73,7 @@ class SpeechToTextAPIView(APIView):
             return Response({"error": "No file provided"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            client = genai.Client(api_key="AIzaSyCryDHv24pUDGF69D3ZEUVQYNaFp7Gn8VI")
+            client = genai.Client(api_key="AIzaSyDVAMbAK_CvTwjQM5CJP9sADPZYcjHLk9U")
             start_time = time.time()
 
            

@@ -43,6 +43,7 @@ class Shop(models.Model):
     owner_name = models.CharField(max_length=150,blank=True, null=True)
     
     owner_phone = models.CharField(max_length=20)
+    is_whatsapp=models.BooleanField(default=True)
     
     shop_image = models.ImageField(upload_to="media/shop",null=True, blank=True)
     status=models.CharField(choices=SHOP_STATUS,default="open",max_length=100)

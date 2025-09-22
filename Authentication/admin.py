@@ -7,7 +7,7 @@ from .models import *
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
      
-    list_display = ("username", "email", "name", "role", "is_active", "is_staff" )
+    list_display = ("username", "email", "name", "role", "is_active", "is_staff","phone" )
     list_filter = ("role", "is_active", "is_staff")
 
      

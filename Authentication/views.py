@@ -124,8 +124,12 @@ class LoginAPIView(APIView):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
-
-        # Generate JWT tokens
+        requested_role = request.data.get("role")
+        if requested_role and user.role != requested_role:
+            return Response(
+                {"detail": f"Invalid role for this user. User role is '{user.role}'"},
+                status=status.HTTP_403_FORBIDDEN
+            )
         refresh = RefreshToken.for_user(user)
 
         return Response({
@@ -140,6 +144,7 @@ class LoginAPIView(APIView):
                 "phone": user.phone,
             }
         }, status=status.HTTP_200_OK)
+
 class ForgotPasswordView(APIView):
     def post(self, request):
         identifier = request.data.get("email")

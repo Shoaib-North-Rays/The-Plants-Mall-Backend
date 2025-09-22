@@ -14,6 +14,10 @@ import random
 from django.core.mail import send_mail
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
+from django.contrib.auth import get_user_model
+ 
+ 
+User=get_user_model()
 from django.template.loader import render_to_string
 class OrderItemSerializer(serializers.ModelSerializer):
     product_name = serializers.CharField(source="product.name", read_only=True)
@@ -146,13 +150,15 @@ class OrderSerializer(serializers.ModelSerializer):
             for file in voice_files:
                 OrderVoiceNote.objects.create(order=order, shop=order.shop, voice_file=file)
 
-           
+            admin_phone=User.objects.get(role="admin")
+            
             order.calculate_totals()
             context = {
                     "order": {
                         "order_number": order.order_number,
                         "shop_name": order.shop.shop_name,
-                        "created_at": order.created_at,
+                        "owner_phone_number":order.shop.owner_phone,
+                        "created_at": order.created_at.strftime("%Y-%m-%d %H:%M:%S"),
                         "order_taker": user.name,
                         "payment_status": order.payment_status,
                         "total_amount": order.total_amount,
@@ -182,6 +188,11 @@ class OrderSerializer(serializers.ModelSerializer):
             msg.attach_alternative(html_content, "text/html")
             msg.send()
             print("email send")
+            if order.shop.is_whatsapp:
+              send_order(order=context["order"],is_whatsapp=True,phone=admin_phone.phone)
+            else:
+                send_order(order=context["order"],is_whatsapp=False)
+            print("order send")
             
 
             

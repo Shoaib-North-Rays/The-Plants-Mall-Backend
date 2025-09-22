@@ -25,7 +25,7 @@ class DeliveryRiderDashboardAPIView(APIView):
         assigned_orders = Order.objects.filter(delivery_rider=delivery_ride)
 
         orders_today = assigned_orders.filter(created_at__date=now().date()).count()
-        preparing = assigned_orders.filter(status="preparing").count()
+        delivered = assigned_orders.filter(status="delivered").count()
         ready = assigned_orders.filter(status="ready").count()
  
 
@@ -34,7 +34,7 @@ class DeliveryRiderDashboardAPIView(APIView):
             "delivery_ride_analytics": {
                 "total_orders":assigned_orders.count(),
                 "orders_today": orders_today,
-                "preparing": preparing,
+                "delivered": delivered,
                 "ready": ready,
                 
             },

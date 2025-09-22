@@ -9,6 +9,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from .models import *
 from django.utils.timezone import now
+from .whatsapp_notification import send_shop_whatsapp_message
 
 
 User = get_user_model()
@@ -38,7 +39,7 @@ class ShopSerializer(serializers.ModelSerializer):
         model = Shop
         fields = [
             "id", "shop_name", "shop_address", "slug",
-            "owner_name", "owner_phone",
+            "owner_name", "owner_phone","is_whatsapp",
             "shop_image", "status",
             "latitude", "longitude", "accuracy",
             "voice_notes", "images", "created_at",
@@ -81,6 +82,10 @@ class ShopSerializer(serializers.ModelSerializer):
             voice_notes = request.FILES.getlist("voice_notes")
             for voice in voice_notes:
                 ShopVoiceNotes.objects.create(shop=shop, voice_note=voice)
+            whats_app=validated_data.get("is_whatsapp")
+            if whats_app:
+              send_shop_whatsapp_message(shop= validated_data.get("shop_name"),address= validated_data.get("shop_address"),owner_name=validated_data.get("owner_name"),phone= validated_data.get("phone"),shop_id=shop.pk)
+            
 
             return shop
 
@@ -143,7 +148,7 @@ class ShopNearBySerializer(serializers.ModelSerializer):
         model = Shop
         fields = [
             "id", "shop_name", "shop_address", "slug",
-            "owner_name", "owner_phone", "shop_image", "status",
+            "owner_name", "owner_phone", "shop_image", "status","is_whatsapp",
             "latitude", "longitude", "accuracy",
             "voice_notes", "images", "created_at",
             "distance",  "total_shops_by_user", "total_orders", "today_orders"
