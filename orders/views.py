@@ -15,6 +15,7 @@ import requests
 from .filters import OrderFilter 
 from django_filters.rest_framework import DjangoFilterBackend
 from plants_mall_shops.permissions import IsSalesManOrAdmin
+from products.models import Product
 class OrderPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
@@ -65,9 +66,8 @@ class SpeechToTextAPIView(APIView):
     def post(self, request, *args, **kwargs):
         file_obj = request.FILES.get("file")
         #client = genai.Client(api_key="AIzaSyAbvFvCs77_a2PwwfA7B2fo9TzVXqk4JuM")
-        res = requests.get(url='https://the-plants-mall-backend.onrender.com/plants-mall-products/api/products/voice-products/')
-        d = res.text
-        d = json.loads(d)
+        products = Product.objects.all()
+        d=list(products.values())   
         d = d.get('results')
         if not file_obj:
             return Response({"error": "No file provided"}, status=status.HTTP_400_BAD_REQUEST)
