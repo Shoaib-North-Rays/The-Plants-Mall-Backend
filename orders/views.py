@@ -65,7 +65,7 @@ class SpeechToTextAPIView(APIView):
     def post(self, request, *args, **kwargs):
         file_obj = request.FILES.get("file")
         #client = genai.Client(api_key="AIzaSyAbvFvCs77_a2PwwfA7B2fo9TzVXqk4JuM")
-        res = requests.get(url='http://192.168.2.7/plants-mall-products/api/products/voice-products/')
+        res = requests.get(url='https://the-plants-mall-backend.onrender.com/plants-mall-products/api/products/voice-products/')
         d = res.text
         d = json.loads(d)
         d = d.get('results')
