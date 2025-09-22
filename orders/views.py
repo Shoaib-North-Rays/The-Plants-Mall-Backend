@@ -16,6 +16,7 @@ from .filters import OrderFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from plants_mall_shops.permissions import IsSalesManOrAdmin
 from products.models import Product
+from products.serializers import ProductSerializerForVoiceOrder
 class OrderPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
@@ -65,10 +66,9 @@ class SpeechToTextAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
         file_obj = request.FILES.get("file")
-        #client = genai.Client(api_key="AIzaSyAbvFvCs77_a2PwwfA7B2fo9TzVXqk4JuM")
         products = Product.objects.all()
-        d=list(products.values())   
-        d = d.get('results')
+        serializer = ProductSerializerForVoiceOrder(products, many=True)
+        d = serializer.data   
         if not file_obj:
             return Response({"error": "No file provided"}, status=status.HTTP_400_BAD_REQUEST)
 
