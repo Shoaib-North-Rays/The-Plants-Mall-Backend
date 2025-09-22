@@ -17,6 +17,7 @@ Pillow
 djangorestframework
 djangorestframework-simplejwt
 django-filter
+
 google-genai
 
 django-jazzmin
