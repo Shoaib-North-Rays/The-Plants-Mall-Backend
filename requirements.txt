@@ -21,3 +21,5 @@ django-filter
 google-genai
 
 django-jazzmin
+
+whitenoise
