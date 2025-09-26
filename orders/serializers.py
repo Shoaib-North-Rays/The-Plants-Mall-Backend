@@ -345,7 +345,7 @@ class OrderSerializer(serializers.ModelSerializer):
                 order=instance,
                 user=user,
             )
-        send_order(order=order_detals(order=instance,user=user),is_whatsapp=False,contact_name=dispatcher.name,phone=dispatcher.phone,dispatcher_or_admin=True)
+        # send_order(order=order_detals(order=instance,user=user),is_whatsapp=False,contact_name=dispatcher.name,phone=dispatcher.phone,dispatcher_or_admin=True)
 
   
         if old_status != "ready" and new_status == "ready" and instance.delivery_rider:
