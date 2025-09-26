@@ -86,34 +86,58 @@ class SpeechToTextAPIView(APIView):
             myfile = client.files.upload(file=temp_path)
 
             response = client.models.generate_content(
-            model="gemini-2.0-flash", contents=[f"""Translate this audio into English efficiently and provide details only about the product name, product quantity, weight and its discount price.
+            model="gemini-2.0-flash", contents=[f"""If there are no product names mentioned in the audio:
+                                                You need to follow this structure for the final response:
+                                                    [
+                                                    {{
+                                                    "message":"The Audio has no information about the Products"
+                                                    }}
+                                                    ]
+                                            If there are products mentioned in the audio:
+                                                Listen carefully to the audio first and then translate this audio into English efficiently and provide details only about the product name, product quantity, weight and its discount price.                                            
                                                 Product name should be extracted from the audio precisely and keep the first alphabet of product name capital.
                                                 Product quantity should be extracted precisely from the audio.
-                                                Product name should always be in English.
+                                                Product name should always be in English language.
+                                                If the audio doesn't contain information about the number of kilos, only kilo/s is mentioned in the audio, consider it as 1 kg.
+                                                If the audio contains information about the carton for the specific product, keep is_carton true and include another field as "carton_id" with respective carton ID for that specific product only. If the audio doesn't contain information about carton for the specfic product, keep is_carton false for that specific product only.
                                                 If the weight is mentioned in the audio with respect to kilos, the unit of weight should be kg. If the weight is mentioned is grams, the unit of weight should be g.
-                                                If the Product name is not available in this list of dictionaries containing prompt name, its id and packing unit: {d}, still follow the below-given structure.
-                                                You need to get id,name,weight and discount price of the respective product from this list of dictionaries containing product name, its respective id and respective packing unit: {d}
-                                                You need to follow this structure for all the products mentioned in the audio:
-                                                [{{
-                                                    "product":Product ID,
-                                                    "product_name":"Product Name in English language",
-                                                    "quantity":"Product Quantity in Integers",
-                                                    "carton_packing_unit":"Weight of Product in Integers if it is in grams or Floats if it is in kilos with unit mentioned as well.",
-                                                    "price":Price of the product according to its respective packing unit,
-                                                    "discount_price":"Discount Price"
-                                                }}]
-                                                If the audio file doesn't contain value for any field, just keep the value for that field as "".
-                                                """, myfile]
-        )
+                                                If the Product name is not available in this list of dictionaries containing product name, its id and packing unit: {d}, still follow the below-given structure. 
+                                                You need to get id, quantity, price of the respective product and variant id, carton id, variant size, weight unit and discount_value of its variant from this list of dictionaries containing product name, its respective id and respective packing unit: {d}  
+                                                
+                                                    You need to follow this structure for all the products mentioned in the audio:
+                                                        [{{
+                                                            "product": Product ID (integer),
+                                                            "price":Product Price (integer),
+                                                            "product_name":Product Name,
+                                                            "variant": Variant ID (integer),
+                                                            "is_carton": true or false,
+                                                            "carton_id": Carton ID (integer),
+                                                            "quantity": Product quantity,
+                                                            "discount_price": Discount Value (integer),
+                                                            "variant_size":Variant Size + Variant Weight Unit
+                                                        }}]
+                                                        If the audio file doesn't contain value for any field, just keep the value for that field as "".
+                                            
+                                            
+                                            """, myfile]
+    )
             end_time = time.time()
             print(f"Time taken: {end_time - start_time:.2f} sec")
             print(response.text.replace("```json","").replace("```",""))
             req = response.text.replace("```json","").replace("```","").replace("\n","").strip()
-            product_names = [p.get('name') for p in d]
+            product_ids = [p.get('id') for p in d]
             req = json.loads(req)
             for product in req:
-                if product.get('product_name') not in product_names:
-                    product['message'] = "This Product is not available at The Plants Mall"
+                if product.get('carton_id') == "":
+                    product.pop('carton_id')
+                if product.get('is_carton') == False:
+                    product["is_carton"] = "false"
+                if product.get('is_carton') == True:
+                    product["is_carton"] = "true"
+                if product.get('product') not in product_ids and product.get('message') == "The Audio has no information about the Products":
+                    product['message'] = "The Audio has no information about the Products"
+                elif product.get('product') not in product_ids:
+                    product["message"] = "This Product is not available at The Plants Mall"
                     
                     end_time = time.time()
              

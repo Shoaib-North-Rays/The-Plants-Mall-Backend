@@ -28,6 +28,9 @@ from orders.models import Order
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
+from .shops_filters import ShopFilter
 
 User = get_user_model()
 
@@ -59,23 +62,26 @@ class ShopCreateAPIView(generics.CreateAPIView):
     permission_classes = [IsSalesManOrAdmin]
     parser_classes = [MultiPartParser, FormParser]   
 
- 
+
 class ShopListAPIView(generics.ListAPIView):
     serializer_class = ShopSerializer
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = ShopPagination  
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_class = ShopFilter
+    search_fields = ["shop_name", "owner_name", "owner_phone"]
+    ordering_fields = ["created_at", "shop_name"]
 
     def get_queryset(self):
         user = self.request.user
 
-        if user.is_superuser or user.is_staff:   
+        if user.is_superuser or user.is_staff:
             return (
                 Shop.objects.all()
                 .select_related("category")
                 .prefetch_related("images", "voice_notes")
             )
 
-     
         return (
             Shop.objects.filter(registered_by=user)
             .select_related("category")
@@ -86,35 +92,6 @@ class ShopUpdateAPIView(generics.RetrieveUpdateAPIView):
     serializer_class = ShopSerializer
     permission_classes = [permissions.IsAuthenticated, IsSalesManOrAdmin]
     lookup_field = "id"
-
-    def perform_update(self, serializer):
-        shop = serializer.save()
-        request = self.request
-
-         
-        images = request.FILES.getlist("images")
-        if images:
-            for img in images:
-                ShopImage.objects.create(shop=shop, image=img)
-        voice_notes = request.FILES.getlist("voice_notes")
-        if voice_notes:
-            for voice in voice_notes:
-                ShopVoiceNotes.objects.create(shop=shop, voice_note=voice)
-
-        return shop
-
-    def update(self, request, *args, **kwargs):
-       
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-
-        return Response({
-            "message": "Shop updated successfully",
-            "shop": serializer.data
-        }, status=status.HTTP_200_OK)
 class NearbyShopsAPIView(generics.ListAPIView):
     serializer_class = ShopNearBySerializer
     permission_classes = [permissions.IsAuthenticated, IsSalesManOrAdmin]

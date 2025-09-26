@@ -35,5 +35,6 @@ class ShopImageAdmin(admin.ModelAdmin):
 admin.site.register(ShopVoiceNotes)
 admin.site.register(ShopSettings)
 admin.site.register(StaffLocations)
+admin.site.register(CompetitorImage)
     
  

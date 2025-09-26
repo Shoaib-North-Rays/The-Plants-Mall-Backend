@@ -4,7 +4,7 @@ from decimal import Decimal
 import uuid
 from django.contrib.auth import get_user_model
 from plants_mall_shops.models import Shop
-from products.models import Product,Cotton
+from products.models import Product,Cotton,Loose,ProductVariant
  
 User=get_user_model()
 
@@ -92,6 +92,8 @@ class OrderItem(models.Model):
     unit_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     discount_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True) 
     cotton = models.ForeignKey(Cotton, null=True, blank=True, on_delete=models.SET_NULL)
+    loose=models.ForeignKey(Loose, null=True, blank=True, on_delete=models.SET_NULL)
+    variant=models.ForeignKey(ProductVariant, null=True, blank=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

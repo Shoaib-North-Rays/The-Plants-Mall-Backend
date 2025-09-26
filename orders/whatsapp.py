@@ -5,7 +5,7 @@ import uuid
 
 API_URL = "http://127.0.0.1:8000/crawl/api/tasks/"
 
-def send_order(order, is_whatsapp, phone):
+def send_order(order, is_whatsapp, phone,contact_name,dispatcher_or_admin=False):
     try:
         headers = {"Content-Type": "application/json"}
         base_payload = {
@@ -21,7 +21,10 @@ def send_order(order, is_whatsapp, phone):
             "device": "",
             "is_order": "true",
             "add_data": {
+                "dispatcher_or_admin": bool(dispatcher_or_admin),
                 "phone": "",
+                "contact_name":contact_name,
+                "contact_name":"",
                 "order_detail": order,
                 "wait_time": 9
             },

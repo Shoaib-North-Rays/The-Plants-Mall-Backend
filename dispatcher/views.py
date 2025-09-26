@@ -6,7 +6,7 @@ from orders.models import Order
 from django.db.models import Sum
 from plants_mall_shops.models import Shop
 from rest_framework import  permissions
-from .permissions import IsDispatcher
+from .permissions import IsDispatcherOrAdmin
 from orders.models import Order
 from rest_framework import generics
 from .serializers import DeliveryRiderSerializer
@@ -16,7 +16,7 @@ User = get_user_model()
 
 
 class DispatcherDashboardAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticated, IsDispatcher]
+    permission_classes = [permissions.IsAuthenticated, IsDispatcherOrAdmin]
 
     def get(self, request):
         dispatcher = request.user  
@@ -41,7 +41,7 @@ class DispatcherDashboardAPIView(APIView):
         })
 class DeliveryRiderAPIView(generics.ListAPIView):
     serializer_class = DeliveryRiderSerializer
-    permission_classes = [permissions.IsAuthenticated, IsDispatcher]
+    permission_classes = [permissions.IsAuthenticated, IsDispatcherOrAdmin]
 
     def get_queryset(self):
         return User.objects.filter(role="delivery_rider", is_active=True)

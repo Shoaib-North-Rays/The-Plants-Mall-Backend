@@ -101,4 +101,11 @@ class StaffLocations(models.Model):
     last_seen = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.identifier}"
+        return f"{self.staff}"
+class CompetitorImage(models.Model):
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE, related_name="competitor_images")
+    image = models.ImageField(upload_to="media/shops_images")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Image for Competitor from  {self.shop.shop_name}"

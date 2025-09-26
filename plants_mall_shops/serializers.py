@@ -27,11 +27,15 @@ class ShopVoiceNoteSerializer(serializers.ModelSerializer):
         model = ShopVoiceNotes    
         fields = ["id", "voice_note", "uploaded_at"]
 
-
+class CompetitorShopImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompetitorImage
+        fields = ["id", "image", "uploaded_at"]
 
 class ShopSerializer(serializers.ModelSerializer):
     images = ShopImageSerializer(many=True, read_only=True)
     voice_notes = ShopVoiceNoteSerializer(many=True, read_only=True)
+    competitor_images=CompetitorShopImageSerializer(many=True, read_only=True)
 
    
 
@@ -40,7 +44,7 @@ class ShopSerializer(serializers.ModelSerializer):
         fields = [
             "id", "shop_name", "shop_address", "slug",
             "owner_name", "owner_phone","is_whatsapp",
-            "shop_image", "status",
+            "shop_image", "status","competitor_images",
             "latitude", "longitude", "accuracy",
             "voice_notes", "images", "created_at",
             
@@ -79,12 +83,15 @@ class ShopSerializer(serializers.ModelSerializer):
             images = request.FILES.getlist("images")
             for img in images:
                 ShopImage.objects.create(shop=shop, image=img)
+            competitor_images=request.FILES.getlist("competitor_images")
+            for cpimag in competitor_images:
+                CompetitorImage.objects.create(shop=shop, image=cpimag)
             voice_notes = request.FILES.getlist("voice_notes")
             for voice in voice_notes:
                 ShopVoiceNotes.objects.create(shop=shop, voice_note=voice)
             whats_app=validated_data.get("is_whatsapp")
             if whats_app:
-              send_shop_whatsapp_message(shop= validated_data.get("shop_name"),address= validated_data.get("shop_address"),owner_name=validated_data.get("owner_name"),phone= validated_data.get("phone"),shop_id=shop.pk)
+              send_shop_whatsapp_message(shop= validated_data.get("shop_name"),address= validated_data.get("shop_address"),owner_name=validated_data.get("owner_name"),phone= validated_data.get("owner_phone"),shop_id=shop.pk)
             
 
             return shop
@@ -101,6 +108,7 @@ class ShopSerializer(serializers.ModelSerializer):
  
         delete_images = request.data.get("delete_images", [])
         delete_voice_notes = request.data.get("delete_voice_notes", [])
+        delete_competitor_images=request.data.get("delete_competitor_images", [])
 
       
         if isinstance(delete_images, str):
@@ -113,10 +121,19 @@ class ShopSerializer(serializers.ModelSerializer):
                 delete_voice_notes = ast.literal_eval(delete_voice_notes)
             except:
                 delete_voice_notes = []
+        if isinstance(delete_competitor_images, str):
+            try:
+                delete_competitor_images = ast.literal_eval(delete_competitor_images)
+            except:
+                delete_competitor_images = []
+
 
     
         if delete_images:
             instance.images.filter(id__in=delete_images).delete()
+        if  delete_competitor_images:
+              
+              instance.competitor_images.filter(id__in=delete_competitor_images).delete()
         if delete_voice_notes:
             instance.voice_notes.filter(id__in=delete_voice_notes).delete()
       
@@ -124,9 +141,9 @@ class ShopSerializer(serializers.ModelSerializer):
         if images:
             for img in images:   
                 ShopImage.objects.create(shop=instance, image=img)
-
- 
-           
+        competitor_images = request.FILES.getlist("competitor_images")
+        for cpimag in competitor_images:
+            CompetitorImage.objects.create(shop=instance, image=cpimag)
 
         voice_notes = request.FILES.getlist("voice_notes")
         for voice in voice_notes:
@@ -143,6 +160,7 @@ class ShopNearBySerializer(serializers.ModelSerializer):
     total_orders = serializers.SerializerMethodField()
     today_orders = serializers.SerializerMethodField()
     distance = serializers.SerializerMethodField()  
+    competitor_images=CompetitorShopImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = Shop
@@ -150,7 +168,7 @@ class ShopNearBySerializer(serializers.ModelSerializer):
             "id", "shop_name", "shop_address", "slug",
             "owner_name", "owner_phone", "shop_image", "status","is_whatsapp",
             "latitude", "longitude", "accuracy",
-            "voice_notes", "images", "created_at",
+            "voice_notes", "images","competitor_images", "created_at",
             "distance",  "total_shops_by_user", "total_orders", "today_orders"
         ]
     def get_total_shops_by_user(self, obj):

@@ -77,15 +77,27 @@ class User(AbstractBaseUser, PermissionsMixin):
 User = get_user_model()
 
 class VerificationCode(models.Model):
-    CODE_FOR=(
+    CODE_FOR = (
         ("registration", "Registration"),
         ("password_reset", "Password Reset"),
     )
+
     user = models.ForeignKey(User, related_name="auth_codes", on_delete=models.CASCADE)
     code = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
     is_used = models.BooleanField(default=False)
-    use_for=models.CharField(choices=CODE_FOR,default="registration",max_length=100)
-    expires_at = models.DateTimeField(default=timezone.now() + timezone.timedelta(minutes=10))
+    use_for = models.CharField(
+        choices=CODE_FOR,
+        default="registration",
+        max_length=100,
+        null=True,
+        blank=True
+    )
+
+    def default_expiry():
+        return timezone.now() + timedelta(minutes=10)
+
+    expires_at = models.DateTimeField(default=default_expiry)
+
     def __str__(self):
         return f"{self.user.username} - {self.code}"

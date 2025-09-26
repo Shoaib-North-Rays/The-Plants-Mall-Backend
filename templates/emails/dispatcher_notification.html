@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+</head>
+<body style="margin: 0; padding: 0; background-color: #F0FDF4; font-family: Arial, sans-serif; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-spacing: 0; mso-table-lspace: 0pt; mso-table-rspace: 0pt; table-layout: fixed; background-color: #F0FDF4;">
+        <tr>
+            <td align="center" style="padding: 0;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width: 100%; max-width: 600px; margin: 20px auto; background-color: #FFFFFF; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); overflow: hidden;">
+                    <!-- Header -->
+                    <tr>
+                        <td style="padding: 0; background-color: #16A34A; text-align: left;">
+                            <table role="presentation" width="100%">
+                               <td style="padding: 20px; background-color: #16A34A; text-align: center;">
+                            <img src="https://theplantsmall.com/cdn/shop/files/LOGO.png?v=1754636222&width=70" alt="The Plants Mall Logo" style="max-width: 120px; display: inline-block; border: 0;">
+                        </td>
+                    </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <!-- Content -->
+                    <tr>
+                        <td style="padding: 40px 40px;">
+                         <p style="font-size: 16px; color: #333333; margin: 0 0 25px;">
+                            A new order has been assigned to you from <b style="color: #166534;">{{ order.shop_name }}</b>. Here are the details.
+                        </p>
+
+                            <!-- Order Summary -->
+                            <div style="background-color: #F9F9F9; border-radius: 6px; padding: 20px; margin-bottom: 25px;">
+                                <table role="presentation" width="100%">
+                                    <tr>
+                                        <td style="font-weight: bold; color: #333333; width: 40%;">Order Number:</td>
+                                        <td style="color: #666666;">{{ order.order_number }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: bold; color: #333333;">Order Date:</td>
+                                        <td style="color: #666666;">{{ order.created_at }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: bold; color: #333333;">Order Taker:</td>
+                                        <td style="color: #666666;">{{ order.order_taker|default:"-" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: bold; color: #333333;">Payment Status:</td>
+                                        <td style="color: #666666;">{{ order.payment_status }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: bold; color: #333333;">Total Amount:</td>
+                                        <td style="color: #666666;">PKR {{ order.total_amount }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div style="color: #166534; font-size: 20px; font-weight: bold; margin-bottom: 15px; border-bottom: 2px solid #E0E0E0; padding-bottom: 10px;">
+                                Order Items
+                            </div>
+                            <!-- Items Table -->
+                           <table role="presentation" width="100%" style="border-collapse: collapse; margin-bottom: 25px;">
+    <thead>
+        <tr>
+            <th style="text-align: left; padding: 12px; border-bottom: 1px solid #E0E0E0; background-color: #FAFAFA;">Product</th>
+            <th style="text-align: left; padding: 12px; border-bottom: 1px solid #E0E0E0; background-color: #FAFAFA;">Weight/Unit</th>
+            <th style="text-align: left; padding: 12px; border-bottom: 1px solid #E0E0E0; background-color: #FAFAFA;">Unit Price</th>
+            <th style="text-align: left; padding: 12px; border-bottom: 1px solid #E0E0E0; background-color: #FAFAFA;">Discount</th>
+            <th style="text-align: center; padding: 12px; border-bottom: 1px solid #E0E0E0; background-color: #FAFAFA;">Quantity</th>
+            <th style="text-align: right; padding: 12px; border-bottom: 1px solid #E0E0E0; background-color: #FAFAFA;">Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in order.items %}
+        <tr>
+            <td style="padding: 12px; border-bottom: 1px solid #E0E0E0;">{{ item.product_name }}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #E0E0E0;">{{ item.cotton.packing_unit }}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #E0E0E0;">PKR {{ item.unit_price }}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #E0E0E0;">
+                {% if item.discount_price %}PKR {{ item.discount_price }}{% else %}-{% endif %}
+            </td>
+            <td style="text-align: center; padding: 12px; border-bottom: 1px solid #E0E0E0;">{{ item.quantity }}</td>
+            <td style="text-align: right; font-weight: bold; padding: 12px; border-bottom: 1px solid #E0E0E0;">
+                PKR {{ item.quantity|floatformat:0|add:item.unit_price|floatformat:2 }}
+            </td>
+        </tr>
+
+        {% if item.cotton %}
+        <!-- Cotton Detail Sub-Row -->
+        <tr>
+            <td colspan="6" style="padding: 10px 12px; background-color: #FAFAFA; border-bottom: 1px solid #E0E0E0;">
+                <table role="presentation" width="100%" style="font-size: 13px; color: #444; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 4px 8px; width: 25%;"><b>Carton ID:</b> {{ item.cotton.id }}</td>
+                        <td style="padding: 4px 8px; width: 25%;"><b>SKU:</b> {{ item.cotton.sku }}</td>
+                        <td style="padding: 4px 8px; width: 25%;"><b>Stock:</b> {{ item.cotton.stock }}</td>
+                        <td style="padding: 4px 8px; width: 25%;"><b>Sold:</b> {{ item.cotton.sold_quantity }}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        {% endif %}
+
+        {% endfor %}
+    </tbody>
+</table>
+
+                            <div style="text-align: right; margin-top: 20px;">
+                                <p style="font-size: 16px; margin: 0 0 5px;">
+                                    Subtotal: <b>PKR {{ order.subtotal }}</b>
+                                </p>
+                                {% if order.total_discount %}
+                                <p style="font-size: 16px; color: #166534; margin: 0 0 5px;">
+                                    Discount: <b>-PKR {{ order.discount_price }}</b>
+                                </p>
+                                {% endif %}
+                                <p style="font-size: 18px; margin: 0 0 5px; font-weight: bold;">
+                                    Total: <b style="color: #166534;">PKR {{ order.total_amount }}</b>
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 20px; background-color: #F0FDF4; color: #6B7280; font-size: 12px; border-top: 1px solid #E0E0E0; text-align: center;">
+                            <p style="margin: 0;">
+                                This is an automated email. Please do not reply.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

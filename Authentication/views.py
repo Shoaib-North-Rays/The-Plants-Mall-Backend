@@ -127,7 +127,7 @@ class LoginAPIView(APIView):
         requested_role = request.data.get("role")
         if requested_role and user.role != requested_role:
             return Response(
-                {"detail": f"Invalid role for this user. User role is '{user.role}'"},
+                {"detail": f"You don't have a permission to to login this role"},
                 status=status.HTTP_403_FORBIDDEN
             )
         refresh = RefreshToken.for_user(user)

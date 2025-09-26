@@ -1,5 +1,10 @@
 from rest_framework.permissions import BasePermission
 
-class IsDispatcher(BasePermission):
+class IsDispatcherOrAdmin(BasePermission):
     def has_permission(self, request, view):
-        return getattr(request.user, "role", None) == "dispatcher"
+        user = request.user
+        if not user or not user.is_authenticated:
+            return False
+
+        
+        return user.role in ["dispatcher", "admin"] or user.is_superuser

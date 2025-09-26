@@ -6,7 +6,7 @@ from orders.models import Order
 from django.db.models import Sum
 from plants_mall_shops.models import Shop
 from rest_framework import  permissions
-from .permissions import IsDeliveryRider
+from .permissions import IsDeliveryOrAdmin
 from orders.models import Order
 from rest_framework import generics
  
@@ -16,7 +16,7 @@ User = get_user_model()
 
 
 class DeliveryRiderDashboardAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticated,  IsDeliveryRider]
+    permission_classes = [permissions.IsAuthenticated,  IsDeliveryOrAdmin]
 
     def get(self, request):
         delivery_ride = request.user  

@@ -225,3 +225,4 @@ JAZZMIN_SETTINGS = {
     "custom_css": "css/custom_admin.css",
 }
 
+ADMIN_EMAIL="visop18945@camjoint.com"

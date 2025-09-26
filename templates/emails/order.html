@@ -56,34 +56,52 @@
                                 Order Items
                             </div>
                             <!-- Items Table -->
-                            <table role="presentation" width="100%" style="border-collapse: collapse; margin-bottom: 25px;">
-                                <thead>
-                                    <tr>
-                                        <th style="text-align: left; padding: 12px; border-bottom: 1px solid #E0E0E0; background-color: #FAFAFA;">Product</th>
-                                        <th style="text-align: left; padding: 12px; border-bottom: 1px solid #E0E0E0; background-color: #FAFAFA;">Weight/Unit</th>
-                                        <th style="text-align: left; padding: 12px; border-bottom: 1px solid #E0E0E0; background-color: #FAFAFA;">Unit Price</th>
-                                        <th style="text-align: left; padding: 12px; border-bottom: 1px solid #E0E0E0; background-color: #FAFAFA;">Discount</th>
-                                        <th style="text-align: center; padding: 12px; border-bottom: 1px solid #E0E0E0; background-color: #FAFAFA;">Quantity</th>
-                                        <th style="text-align: right; padding: 12px; border-bottom: 1px solid #E0E0E0; background-color: #FAFAFA;">Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for item in order.items %}
-                                    <tr>
-                                        <td style="padding: 12px; border-bottom: 1px solid #E0E0E0;">{{ item.product_name }}</td>
-                                        <td style="padding: 12px; border-bottom: 1px solid #E0E0E0;">{{ item.cotton_packing_unit }}</td>
-                                        <td style="padding: 12px; border-bottom: 1px solid #E0E0E0;">PKR {{ item.unit_price }}</td>
-                                        <td style="padding: 12px; border-bottom: 1px solid #E0E0E0;">
-                                            {% if item.discount_price %}PKR {{ item.discount_price }}{% else %}-{% endif %}
-                                        </td>
-                                        <td style="text-align: center; padding: 12px; border-bottom: 1px solid #E0E0E0;">{{ item.quantity }}</td>
-                                        <td style="text-align: right; font-weight: bold; padding: 12px; border-bottom: 1px solid #E0E0E0;">
-                                            PKR {{ item.quantity|floatformat:0|add:item.unit_price|floatformat:2 }}
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+                           <table role="presentation" width="100%" style="border-collapse: collapse; margin-bottom: 25px;">
+    <thead>
+        <tr>
+            <th style="text-align: left; padding: 12px; border-bottom: 1px solid #E0E0E0; background-color: #FAFAFA;">Product</th>
+            <th style="text-align: left; padding: 12px; border-bottom: 1px solid #E0E0E0; background-color: #FAFAFA;">Weight/Unit</th>
+            <th style="text-align: left; padding: 12px; border-bottom: 1px solid #E0E0E0; background-color: #FAFAFA;">Unit Price</th>
+            <th style="text-align: left; padding: 12px; border-bottom: 1px solid #E0E0E0; background-color: #FAFAFA;">Discount</th>
+            <th style="text-align: center; padding: 12px; border-bottom: 1px solid #E0E0E0; background-color: #FAFAFA;">Quantity</th>
+            <th style="text-align: right; padding: 12px; border-bottom: 1px solid #E0E0E0; background-color: #FAFAFA;">Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in order.items %}
+        <tr>
+            <td style="padding: 12px; border-bottom: 1px solid #E0E0E0;">{{ item.product_name }}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #E0E0E0;">{{ item.cotton.packing_unit }}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #E0E0E0;">PKR {{ item.unit_price }}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #E0E0E0;">
+                {% if item.discount_price %}PKR {{ item.discount_price }}{% else %}-{% endif %}
+            </td>
+            <td style="text-align: center; padding: 12px; border-bottom: 1px solid #E0E0E0;">{{ item.quantity }}</td>
+            <td style="text-align: right; font-weight: bold; padding: 12px; border-bottom: 1px solid #E0E0E0;">
+                PKR {{ item.quantity|floatformat:0|add:item.unit_price|floatformat:2 }}
+            </td>
+        </tr>
+
+        {% if item.cotton %}
+        <!-- Cotton Detail Sub-Row -->
+        <tr>
+            <td colspan="6" style="padding: 10px 12px; background-color: #FAFAFA; border-bottom: 1px solid #E0E0E0;">
+                <table role="presentation" width="100%" style="font-size: 13px; color: #444; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 4px 8px; width: 25%;"><b>Carton ID:</b> {{ item.cotton.id }}</td>
+                        <td style="padding: 4px 8px; width: 25%;"><b>SKU:</b> {{ item.cotton.sku }}</td>
+                        <td style="padding: 4px 8px; width: 25%;"><b>Stock:</b> {{ item.cotton.stock }}</td>
+                        <td style="padding: 4px 8px; width: 25%;"><b>Sold:</b> {{ item.cotton.sold_quantity }}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        {% endif %}
+
+        {% endfor %}
+    </tbody>
+</table>
+
                             <div style="text-align: right; margin-top: 20px;">
                                 <p style="font-size: 16px; margin: 0 0 5px;">
                                     Subtotal: <b>PKR {{ order.subtotal }}</b>
